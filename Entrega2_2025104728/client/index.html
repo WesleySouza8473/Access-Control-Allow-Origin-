@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prática CORS - Entrega 2</title>
+  <style>
+    body {
+      margin: 2rem;
+      background: #f4f6f8;
+      color: #202124;
+      font-family: sans-serif;
+    }
+
+    .card {
+      max-width: 600px;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 4px;
+      background: #0066cc;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #004c99;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 1rem;
+      border-radius: 4px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+    }
+
+    .erro {
+      color: #d93025;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Painel do Cliente</h1>
+    <p>Estudante: <strong>WESLEY DOS SANTOS DE SOUZA</strong></p>
+    <p>RA: <strong>2025104728</strong></p>
+    <p>Origem do cliente: <strong id="origem-atual">Detectando...</strong></p>
+    <button id="btn-requisicao" type="button">Executar Requisição</button>
+    <h2>Resultado</h2>
+    <pre id="saida" aria-live="polite">Nenhuma requisição disparada ainda.</pre>
+  </main>
+
+  <script>
+    document.getElementById('origem-atual').textContent = window.location.origin;
+
+    const API_URL = `${window.location.protocol}//${window.location.hostname.replace(/-3000\./, '-8080.')}/dados`;
+
+    document.getElementById('btn-requisicao').addEventListener('click', () => {
+      const saida = document.getElementById('saida');
+      saida.textContent = 'Disparando requisição...';
+      saida.classList.remove('erro');
+
+      fetch(API_URL, {
+        method: 'GET',
+        headers: {
+          'X-Identificador-Estudante': '2025104728'
+        }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+          return res.json();
+        })
+        .then(dados => {
+          saida.textContent = JSON.stringify(dados, null, 2);
+        })
+        .catch(err => {
+          saida.classList.add('erro');
+          saida.textContent = `Falha na requisição (CORS ou conexão):\n${err.message}`;
+        });
+    });
+  </script>
+</body>
+</html>
